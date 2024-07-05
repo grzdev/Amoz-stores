@@ -1,18 +1,15 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 
 import '../../components/card.dart';
-import '../../components/product.dart';
+import '../../components/product_model.dart';
+import '../../components/products.dart'; // Import the products list
 
 class ProductScreen extends StatefulWidget {
   const ProductScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _ProductScreenState createState() => _ProductScreenState();
 }
-
 
 class _ProductScreenState extends State<ProductScreen> {
   late Future<List<Product>> futureProducts;
@@ -24,9 +21,8 @@ class _ProductScreenState extends State<ProductScreen> {
   }
 
   Future<List<Product>> loadProducts() async {
-    final String response = await rootBundle.loadString('lib/components/data.json');
-    final data = await json.decode(response);
-    return (data['data'] as List).map((i) => Product.fromJson(i)).toList();
+    // Use the hardcoded products list instead of loading from JSON
+    return products.map((i) => Product.fromJson(i)).toList();
   }
 
   @override
@@ -56,14 +52,13 @@ class _ProductScreenState extends State<ProductScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             IconButton(
-            onPressed: () {
-              // Check if the current route is not ProductScreen
+              onPressed: () {
               bool alreadyOnProductScreen = false;
               Navigator.popUntil(context, (route) {
                 if (route.settings.name == "ProductScreen") {
                   alreadyOnProductScreen = true;
                 }
-                return true; // Don't actually pop any routes
+                  return true;
               });
 
               if (!alreadyOnProductScreen) {
@@ -87,7 +82,6 @@ class _ProductScreenState extends State<ProductScreen> {
           ],
         ),
       ),
-      //change the list formart to a 3 x 3 grid and column and add spaces to the tob and bottom of the grid
       body: FutureBuilder<List<Product>>(
         future: futureProducts,
         builder: (context, snapshot) {
@@ -98,14 +92,14 @@ class _ProductScreenState extends State<ProductScreen> {
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('No products found'));
           } else {
-            return Padding( // Add Padding widget here
-              padding: const EdgeInsets.only(top: 8.0, bottom: 8.0), // Top and bottom padding
+            return Padding(
+              padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3, // Change to 3 columns for a 3x3 grid
-                  childAspectRatio: 2.0, // Adjust aspect ratio if needed
-                  crossAxisSpacing: 5.0, // Space between columns
-                  mainAxisSpacing: 6.0, // Space between rows
+                  crossAxisCount: 3,
+                  childAspectRatio: 2.0,
+                  crossAxisSpacing: 5.0,
+                  mainAxisSpacing: 6.0,
                 ),
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
@@ -116,7 +110,7 @@ class _ProductScreenState extends State<ProductScreen> {
                     imageUrl: product.img,
                   );
                 },
-              )
+              ),
             );
           }
         },
@@ -124,6 +118,3 @@ class _ProductScreenState extends State<ProductScreen> {
     );
   }
 }
-
-
-
